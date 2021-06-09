@@ -1,2 +1,2 @@
 # netlify_function
-Welcome
+netlify function test
