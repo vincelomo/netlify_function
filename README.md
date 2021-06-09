@@ -1,1 +1,2 @@
 # netlify_function
+Welcome
