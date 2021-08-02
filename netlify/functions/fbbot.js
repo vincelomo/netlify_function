@@ -1,3 +1,5 @@
+const request = require('request')
+
 exports.handler = async function(event, context) {
     console.log(`received ${event.httpMethod} request`);
 
