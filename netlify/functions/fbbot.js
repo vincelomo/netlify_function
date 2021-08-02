@@ -81,7 +81,7 @@ exports.handler = async function(event, context) {
 }
 
 // Handles messages events
-async function handleMessage(senderPsid, receivedMessage) {
+function handleMessage(senderPsid, receivedMessage) {
     let response;
   
     // Checks if the message contains text
@@ -123,11 +123,11 @@ async function handleMessage(senderPsid, receivedMessage) {
     }
   
     // Send the response message
-    await callSendAPI(senderPsid, response);
+    return callSendAPI(senderPsid, response);
 }
   
 // Handles messaging_postbacks events
-async function handlePostback(senderPsid, receivedPostback) {
+function handlePostback(senderPsid, receivedPostback) {
     let response;
   
     // Get the payload for the postback
@@ -141,7 +141,7 @@ async function handlePostback(senderPsid, receivedPostback) {
     }
 
     // Send the message to acknowledge the postback
-    await callSendAPI(senderPsid, response);
+    return callSendAPI(senderPsid, response);
 }
   
 // Sends response messages via the Send API
@@ -159,10 +159,10 @@ async function callSendAPI(senderPsid, response) {
         },
         'message': response
     };
-  
+    
     try {
         // Send the HTTP request to the Messenger Platform
-        await got.post(
+        const gotResponse = await got.post(
             `https://graph.facebook.com/v11.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`,
             {
                 json: requestBody
@@ -170,7 +170,9 @@ async function callSendAPI(senderPsid, response) {
         )
 
         console.log('Message sent!');
+        return gotResponse
     } catch (sendErr) {
         console.error('Unable to send message:' + sendErr);
+        return Promise.reject(sendErr)
     }
 }
