@@ -1,7 +1,5 @@
 exports.handler = async function(event, context) {
     // Your verify token. Should be a random string.
-    const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
-    // Your verify token. Should be a random string.
     const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
     if(event.httpMethod === "GET"){
@@ -40,7 +38,7 @@ exports.handler = async function(event, context) {
 
     if(event.httpMethod === "POST"){
         let body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-
+        console.log(`received POST body: ${body}`)
         // Checks if this is an event from a page subscription
         if (body.object === 'page') {
 
