@@ -145,7 +145,7 @@ function handlePostback(senderPsid, receivedPostback) {
 }
   
 // Sends response messages via the Send API
-async function callSendAPI(senderPsid, response) {
+function callSendAPI(senderPsid, response) {
     console.log('sending FB Messenger response...')
 
     // The page access token we have generated in your app settings
@@ -159,20 +159,15 @@ async function callSendAPI(senderPsid, response) {
         },
         'message': response
     };
-    
-    try {
-        // Send the HTTP request to the Messenger Platform
-        const gotResponse = await got.post(
-            `https://graph.facebook.com/v11.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`,
-            {
-                json: requestBody
-            }
-        )
 
+    return got.post(
+        `https://graph.facebook.com/v11.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`,
+        {
+            json: requestBody
+        }
+    ).then(() => {
         console.log('Message sent!');
-        return gotResponse
-    } catch (sendErr) {
-        console.error('Unable to send message:' + sendErr);
-        return Promise.reject(sendErr)
-    }
+    }).catch(err => {
+        console.log('Unable to send message:' + err);
+    })
 }
