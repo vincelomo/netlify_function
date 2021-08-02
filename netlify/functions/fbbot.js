@@ -46,7 +46,7 @@ exports.handler = async function(event, context) {
         if (body.object === 'page') {
 
             // Iterates over each entry - there may be multiple if batched
-            body.entry.forEach(function(entry) {
+            const promiseArray = body.entry.map(async function(entry) {
 
                 // Gets the body of the webhook event
                 let webhookEvent = entry.messaging[0];
@@ -64,6 +64,8 @@ exports.handler = async function(event, context) {
                     await handlePostback(senderPsid, webhookEvent.postback);
                 }
             });
+
+            Promise.all(promiseArray)
 
             // Returns a '200 OK' response to all requests
             return {
