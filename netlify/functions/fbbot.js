@@ -46,7 +46,7 @@ exports.handler = async function(event, context) {
         if (body.object === 'page') {
 
             // Iterates over each entry - there may be multiple if batched
-            const promiseArray = body.entry.map(async function(entry) {
+            const promiseArray = body.entry.map(function(entry) {
 
                 // Gets the body of the webhook event
                 let webhookEvent = entry.messaging[0];
@@ -59,13 +59,13 @@ exports.handler = async function(event, context) {
                 // Check if the event is a message or postback and
                 // pass the event to the appropriate handler function
                 if (webhookEvent.message) {
-                    await handleMessage(senderPsid, webhookEvent.message);
+                    return handleMessage(senderPsid, webhookEvent.message);
                 } else if (webhookEvent.postback) {
-                    await handlePostback(senderPsid, webhookEvent.postback);
+                    return handlePostback(senderPsid, webhookEvent.postback);
                 }
             });
 
-            Promise.all(promiseArray)
+            await Promise.all(promiseArray)
 
             // Returns a '200 OK' response to all requests
             return {
