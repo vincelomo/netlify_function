@@ -1,4 +1,4 @@
-const request = require('request')
+const got = require('got')
 
 exports.handler = async function(event, context) {
     console.log(`received ${event.httpMethod} request`);
@@ -59,9 +59,9 @@ exports.handler = async function(event, context) {
                 // Check if the event is a message or postback and
                 // pass the event to the appropriate handler function
                 if (webhookEvent.message) {
-                    handleMessage(senderPsid, webhookEvent.message);
+                    await handleMessage(senderPsid, webhookEvent.message);
                 } else if (webhookEvent.postback) {
-                    handlePostback(senderPsid, webhookEvent.postback);
+                    await handlePostback(senderPsid, webhookEvent.postback);
                 }
             });
 
@@ -81,7 +81,7 @@ exports.handler = async function(event, context) {
 }
 
 // Handles messages events
-function handleMessage(senderPsid, receivedMessage) {
+async function handleMessage(senderPsid, receivedMessage) {
     let response;
   
     // Checks if the message contains text
@@ -123,11 +123,11 @@ function handleMessage(senderPsid, receivedMessage) {
     }
   
     // Send the response message
-    callSendAPI(senderPsid, response);
+    await callSendAPI(senderPsid, response);
 }
   
 // Handles messaging_postbacks events
-function handlePostback(senderPsid, receivedPostback) {
+async function handlePostback(senderPsid, receivedPostback) {
     let response;
   
     // Get the payload for the postback
@@ -141,34 +141,36 @@ function handlePostback(senderPsid, receivedPostback) {
     }
 
     // Send the message to acknowledge the postback
-    callSendAPI(senderPsid, response);
+    await callSendAPI(senderPsid, response);
 }
   
 // Sends response messages via the Send API
-function callSendAPI(senderPsid, response) {
-  
+async function callSendAPI(senderPsid, response) {
+    console.log('sending FB Messenger response...')
+
     // The page access token we have generated in your app settings
     const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
   
     // Construct the message body
     let requestBody = {
+        'messaging_type': 'RESPONSE',
         'recipient': {
             'id': senderPsid
         },
         'message': response
     };
   
-    // Send the HTTP request to the Messenger Platform
-    request({
-        'uri': 'https://graph.facebook.com/v2.6/me/messages',
-        'qs': { 'access_token': PAGE_ACCESS_TOKEN },
-        'method': 'POST',
-        'json': requestBody
-    }, (err, _res, _body) => {
-        if (!err) {
-            console.log('Message sent!');
-        } else {
-            console.error('Unable to send message:' + err);
-        }
-    });
+    try {
+        // Send the HTTP request to the Messenger Platform
+        await got.post(
+            `https://graph.facebook.com/v11.0/me/messages?access_token=${PAGE_ACCESS_TOKEN}`,
+            {
+                json: requestBody
+            }
+        )
+
+        console.log('Message sent!');
+    } catch (sendErr) {
+        console.error('Unable to send message:' + sendErr);
+    }
 }
