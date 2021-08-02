@@ -1,4 +1,6 @@
 exports.handler = async function(event, context) {
+    console.log(`received ${event.httpMethod} request`);
+
     // Your verify token. Should be a random string.
     const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
 
