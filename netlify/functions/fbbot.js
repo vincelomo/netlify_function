@@ -19,7 +19,6 @@ exports.handler = async function(event, context) {
             if (mode === 'subscribe' && token === VERIFY_TOKEN) {
                 // Responds with the challenge token from the request
                 console.log('WEBHOOK_VERIFIED');
-                // res.status(200).send(challenge);
                 return {
                     statusCode: 200,
                     body: challenge
@@ -67,11 +66,16 @@ exports.handler = async function(event, context) {
             });
 
             // Returns a '200 OK' response to all requests
-            res.status(200).send('EVENT_RECEIVED');
+            return {
+                statusCode: 200,
+                body: 'EVENT_RECEIVED'
+            };
         } else {
 
             // Returns a '404 Not Found' if event is not from a page subscription
-            res.sendStatus(404);
+            return {
+                statusCode: 404
+            };
         }
     }
 }
